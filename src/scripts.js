@@ -65,9 +65,32 @@ function updateDisplay(){
   $("#playpause").html("<i class = 'fas fa-fw fa-" + (paused ? "play" : "pause") + "'></i>");
 }
 
+function startVisualization(data){
+  setInterval(function(){
+    if(!paused){
+      goForward();
+      $("#killfeed p").append("<span data-year = '" + year +"'>" + year + ": <br></span>");
+    }
+
+    $("#killfeed p span").each(function(){
+      if($(this).data().year - year > 0) $(this).remove();
+      else if($(this).data().year - year <= -3){
+        $(this).fadeOut(function(){
+          $(this).remove();
+        });
+      }
+    });
+  }, speed);
+}
+
 $("document").ready(function(){
   updateDisplay();
-  setInterval(function(){ //Start visualization
-    if(!paused) goForward();
-  }, speed);
+  $.ajax({ //Read the csv
+    type: "GET",
+    url: "../assets/data.csv",
+    dataType: "text",
+    success: function(data){
+      startVisualization(data);
+    }
+  });
 });
