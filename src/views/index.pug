@@ -6,12 +6,30 @@ html(lang='en')
     meta(name='viewport', content='width=device-width, initial-scale=1')
     meta(name = "description" content = "A data visualization showing the rise and fall of global communism, from 1917 to 2017.")
     meta(name = "author" content = "Jeffrey Shen")
-    title Jeffrey Shen
-    link(href='Assets/bower_components/font-awesome/css/font-awesome.min.css', rel='stylesheet', type='text/css')
+    title The Spread of Communism
+    link(href='bower_components/font-awesome/web-fonts-with-css/css/fontawesome-all.min.css' rel='stylesheet' type='text/css')
+    link(href='bower_components/leaflet/dist/leaflet.css' rel='stylesheet' type='text/css')
     link(href='dist/CSS/main.css', rel='stylesheet', type='text/css')
-    script(src='Assets/bower_components/jquery/dist/jquery.min.js')
-    script(src='Assets/bower_components/d3/d3.min.js')
-    script(src='Assets/bower_components/leaflet/dist/leaflet.js')
-    script(src='dist/script-min.js')
+    script(src='bower_components/jquery/dist/jquery.min.js')
+    script(src='bower_components/d3/d3.min.js')
+    script(src='bower_components/leaflet/dist/leaflet.js')
   body
+    #wrapper
+      #visualization
+        #map
+        #killfeed 
+          p sample text 
+        #controls
+          h2#year 
+          a(onclick = "goBack()") 
+            i.fas.fa-fw.fa-chevron-left
+          a#playpause(onclick = "pause()")
+          a(onclick = "goForward()")
+            i.fas.fa-fw.fa-chevron-right
+      #textbox 
+        center
+          h1 The Spread of Communism
+          p A data visualization showing the rise of global communism, from 1917 to 2017.
+          a(href = "https://github.com/jeffreyshen19/The-Spread-of-Communism") Source Code
+    script(src='dist/scripts-min.js')
     
