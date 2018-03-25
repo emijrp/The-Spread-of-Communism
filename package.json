@@ -1,0 +1,26 @@
+{
+  "name": "spread-of-communism",
+  "version": "1.0.0",
+  "description": "A data visualization showing the rise and fall of global communism, from 1917 to 2017.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeffreyshen19/The-Spread-of-Communism.git"
+  },
+  "author": "Jeffrey Shen <jeffreyshencc@gmail.com> (http://jeffreyshen.com)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jeffreyshen19/The-Spread-of-Communism/issues"
+  },
+  "homepage": "https://github.com/jeffreyshen19/The-Spread-of-Communism#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-minify": "^2.1.0",
+    "gulp-pug": "^3.3.0",
+    "gulp-sass": "^3.2.1",
+    "gulp-webserver": "^0.9.1"
+  }
+}
