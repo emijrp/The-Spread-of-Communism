@@ -20,16 +20,34 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken: 'pk.eyJ1IjoiamVmZnJleXNoZW5jYyIsImEiOiJjamE5MDI4YmowMmMzMndzNDdoZmZnYzF5In0.zV3f0WhqbHeyixwY--TyZg'
 }).addTo(map);
 
-/*$.ajax({
+$.ajax({
   dataType: "json",
   url: "../assets/countries.geo.json",
-  success: function(data) {
-    L.geoJSON(data).addTo(map);
+  success: function(geojson) {
+    var layer = L.geoJSON(geojson, {
+      style: {
+        fillColor: "#e74c3c",
+        color: "#e74c3c",
+        weight: 1,
+        fillOpacity: 0,
+        opacity: 0
+      }
+    }).addTo(map);
+
+    updateDisplay();
+    $.ajax({ //Read the csv
+      type: "GET",
+      url: "../assets/data.csv",
+      dataType: "text",
+      success: function(csv){
+        startVisualization(layer, csv);
+      }
+    });
   },
   error: function(){
 
   }
-});*/
+});
 
 /*
   Controls
@@ -65,13 +83,25 @@ function updateDisplay(){
   $("#playpause").html("<i class = 'fas fa-fw fa-" + (paused ? "play" : "pause") + "'></i>");
 }
 
-function startVisualization(data){
+function startVisualization(geojsonLayer, csv){
   setInterval(function(){
     if(!paused){
-      goForward();
+      //Communism animations
+      /*geojsonLayer.eachLayer(function(layer){
+        //console.log(layer.feature.properties.A3);
+        layer.setStyle({
+          fillOpacity: 0.3,
+          opacity: 1
+        });
+      });*/
+
+      //Add year to killfeed
       $("#killfeed p").append("<span data-year = '" + year +"'>" + year + ": <br></span>");
+
+      goForward();
     }
 
+    //Killfeed animation
     $("#killfeed p span").each(function(){
       if($(this).data().year - year > 0) $(this).remove();
       else if($(this).data().year - year <= -3){
@@ -82,15 +112,3 @@ function startVisualization(data){
     });
   }, speed);
 }
-
-$("document").ready(function(){
-  updateDisplay();
-  $.ajax({ //Read the csv
-    type: "GET",
-    url: "../assets/data.csv",
-    dataType: "text",
-    success: function(data){
-      startVisualization(data);
-    }
-  });
-});
