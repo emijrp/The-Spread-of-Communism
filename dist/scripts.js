@@ -7,6 +7,9 @@ var map = L.map('map', {
   maxZoom: 8
 }).setView([51.505, -0.09], 13);
 
+var country_codes,
+    csv;
+
 map.setZoom(2);
 map.panTo(new L.LatLng(25, 0));
 map.setMaxBounds([
@@ -20,11 +23,30 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     accessToken: 'pk.eyJ1IjoiamVmZnJleXNoZW5jYyIsImEiOiJjamE5MDI4YmowMmMzMndzNDdoZmZnYzF5In0.zV3f0WhqbHeyixwY--TyZg'
 }).addTo(map);
 
+$.ajax({ //Read the country codes
+  type: "GET",
+  url: "../assets/country_codes.json",
+  dataType: "text",
+  success: function(codes){
+    country_codes = JSON.parse(codes);
+  }
+});
+
+$.ajax({ //Read the csv
+  type: "GET",
+  url: "../assets/data.csv",
+  dataType: "text",
+  success: function(csv_data){
+    csv = csv_data;
+  }
+});
+
 $.ajax({
   dataType: "json",
   url: "../assets/countries.geo.json",
-  success: function(geojson) {
-    var layer = L.geoJSON(geojson, {
+  success: function(geojson){
+    while(!country_codes){} //Wait until country codes have loaded
+    var layer = L.geoJSON(geojson, { //Add Geojson to map
       style: {
         fillColor: "#e74c3c",
         color: "#e74c3c",
@@ -32,22 +54,30 @@ $.ajax({
         fillOpacity: 0,
         opacity: 0
       }
-    }).addTo(map);
+    })
+    .bindTooltip(function(layer){ //Add tooltip
+      return getNameFromCode(layer.feature.properties.A3);
+    }, {sticky: true})
+    .addTo(map);
 
     updateDisplay();
-    $.ajax({ //Read the csv
-      type: "GET",
-      url: "../assets/data.csv",
-      dataType: "text",
-      success: function(csv){
-        startVisualization(layer, csv);
-      }
-    });
-  },
-  error: function(){
 
+    while(!csv){} //Wait until csv has loaded
+    startVisualization(layer);
   }
 });
+
+/*
+  Helper methods
+*/
+
+function getNameFromCode(code){
+  for(var i = 0; i < country_codes.length; i++){
+    if(country_codes[i].code == code) return country_codes[i].name;
+  }
+
+  return null;
+}
 
 /*
   Controls
@@ -83,7 +113,7 @@ function updateDisplay(){
   $("#playpause").html("<i class = 'fas fa-fw fa-" + (paused ? "play" : "pause") + "'></i>");
 }
 
-function startVisualization(geojsonLayer, csv){
+function startVisualization(geojsonLayer){
   setInterval(function(){
     if(!paused){
       //Communism animations
