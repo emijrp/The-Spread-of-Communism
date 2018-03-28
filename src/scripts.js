@@ -1,4 +1,26 @@
 /*
+  Read data
+*/
+
+$.ajax({ //Read the country codes
+  type: "GET",
+  url: "../assets/country_codes.json",
+  dataType: "text",
+  success: function(codes){
+    country_codes = JSON.parse(codes);
+  }
+});
+
+$.ajax({ //Read the csv
+  type: "GET",
+  url: "../assets/data.csv",
+  dataType: "text",
+  success: function(csv_data){
+    csv = csv_data;
+  }
+});
+
+/*
   Initialize Map
 */
 
@@ -22,24 +44,6 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
     id: 'mapbox.light',
     accessToken: 'pk.eyJ1IjoiamVmZnJleXNoZW5jYyIsImEiOiJjamE5MDI4YmowMmMzMndzNDdoZmZnYzF5In0.zV3f0WhqbHeyixwY--TyZg'
 }).addTo(map);
-
-$.ajax({ //Read the country codes
-  type: "GET",
-  url: "../assets/country_codes.json",
-  dataType: "text",
-  success: function(codes){
-    country_codes = JSON.parse(codes);
-  }
-});
-
-$.ajax({ //Read the csv
-  type: "GET",
-  url: "../assets/data.csv",
-  dataType: "text",
-  success: function(csv_data){
-    csv = csv_data;
-  }
-});
 
 $.ajax({
   dataType: "json",
