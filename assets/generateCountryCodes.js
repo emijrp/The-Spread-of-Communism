@@ -1,5 +1,5 @@
 /*
-  Reads the CSV and outputs a clean json file
+  Reads the country code CSV and outputs a clean json file
 */
 
 var fs = require("fs");

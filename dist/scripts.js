@@ -2,6 +2,9 @@
   Read data
 */
 
+var country_codes,
+    json;
+
 $.ajax({ //Read the country codes
   type: "GET",
   url: "../assets/country_codes.json",
@@ -11,12 +14,12 @@ $.ajax({ //Read the country codes
   }
 });
 
-$.ajax({ //Read the csv
+$.ajax({ //Read the json
   type: "GET",
-  url: "../assets/data.csv",
+  url: "../assets/data.json",
   dataType: "text",
-  success: function(csv_data){
-    csv = csv_data;
+  success: function(json_data){
+    json = JSON.parse(json_data);
   }
 });
 
@@ -28,9 +31,6 @@ var map = L.map('map', {
   minZoom: 2,
   maxZoom: 8
 }).setView([51.505, -0.09], 13);
-
-var country_codes,
-    csv;
 
 map.setZoom(2);
 map.panTo(new L.LatLng(25, 0));
@@ -66,7 +66,7 @@ $.ajax({
 
     updateDisplay();
 
-    while(!csv){} //Wait until csv has loaded
+    while(!json){} //Wait until json has loaded
     startVisualization(layer);
   }
 });
@@ -119,18 +119,45 @@ function updateDisplay(){
 
 function startVisualization(geojsonLayer){
   setInterval(function(){
+    updateDisplay();
+
     if(!paused){
       //Communism animations
-      /*geojsonLayer.eachLayer(function(layer){
-        //console.log(layer.feature.properties.A3);
-        layer.setStyle({
-          fillOpacity: 0.3,
-          opacity: 1
-        });
-      });*/
+      var countriesToColor = [],
+          countriesToUncolor = [];
 
-      //Add year to killfeed
-      $("#killfeed p").append("<span data-year = '" + year +"'>" + year + ": <br></span>");
+      for(var i = 0; i < json.length; i++){
+        if(json[i].start <= year && (json[i].end == null || year <= json[i].end)){
+          //Add year to killfeed
+          if(json[i].start == year) $("#killfeed p").append("<span data-year = '" + year +"'>" + year + ": " + json[i].name + " fell to communism<br></span>");
+          json[i].country_codes.forEach(function(code){
+            countriesToColor.push(code);
+          });
+        }
+        else if(json[i].end != null && (year > json[i].end || year < json[i].start)){
+          //TODO: add killfeed
+          json[i].country_codes.forEach(function(code){
+            countriesToUncolor.push(code);
+          });
+        }
+      }
+
+      if(countriesToColor.length > 0 || countriesToUncolor.length > 0){
+        geojsonLayer.eachLayer(function(layer){
+          if(countriesToColor.includes(layer.feature.properties.A3)){
+            layer.setStyle({
+              fillOpacity: 0.3,
+              opacity: 1
+            });
+          }
+          else if(countriesToUncolor.includes(layer.feature.properties.A3)){
+            layer.setStyle({
+              fillOpacity: 0,
+              opacity: 0
+            });
+          }
+        });
+      }
 
       goForward();
     }
