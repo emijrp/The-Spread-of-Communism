@@ -7,7 +7,7 @@ var country_codes,
 
 $.ajax({ //Read the country codes
   type: "GET",
-  url: "./../assets/country_codes.json",
+  url: "/The-Spread-of-Communism/assets/country_codes.json",
   dataType: "text",
   success: function(codes){
     country_codes = JSON.parse(codes);
@@ -16,7 +16,7 @@ $.ajax({ //Read the country codes
 
 $.ajax({ //Read the json
   type: "GET",
-  url: "./../assets/data.json",
+  url: "/The-Spread-of-Communism/assets/data.json",
   dataType: "text",
   success: function(json_data){
     json = JSON.parse(json_data);
@@ -49,7 +49,7 @@ L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
 
 $.ajax({
   dataType: "json",
-  url: "./../assets/countries.geo.json",
+  url: "/The-Spread-of-Communism/assets/countries.geo.json",
   success: function(geojson){
     while(!country_codes){} //Wait until country codes have loaded
     var layer = L.geoJSON(geojson, { //Add Geojson to map
