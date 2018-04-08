@@ -60,3 +60,21 @@
     }
   }
 }
+
+@media screen and (max-width: 600px){
+  #wrapper{
+    #visualization{
+      #controls{
+        bottom: 40px;
+        width: calc(100% - 60px);
+      }
+
+      #killfeed{
+        bottom: 70px;
+        p{
+          width: 100%;
+        }
+      }
+    }
+  }
+}
