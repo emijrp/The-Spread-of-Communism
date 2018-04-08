@@ -39,6 +39,8 @@ map.setMaxBounds([
     [-37.5, -225]
 ]);
 
+var geojsonLayer;
+
 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
     id: 'mapbox.light',
@@ -64,10 +66,11 @@ $.ajax({
     }, {sticky: true})
     .addTo(map);
 
+    geojsonLayer = layer;
     updateDisplay();
 
     while(!json){} //Wait until json has loaded
-    startVisualization(layer);
+    startVisualization();
   }
 });
 
@@ -112,62 +115,70 @@ function pause(){
   Visualization
 */
 
+var killfeed = [];
+
 function updateDisplay(){
   $("#year").text(year);
   $("#playpause").html("<i class = 'fas fa-fw fa-" + (paused ? "play" : "pause") + "'></i>");
-}
 
-function startVisualization(geojsonLayer){
-  setInterval(function(){
-    updateDisplay();
+  //Communism animations
+  var countriesToColor = [],
+      countriesToUncolor = [];
 
-    if(!paused){
-      //Communism animations
-      var countriesToColor = [],
-          countriesToUncolor = [];
+//TODO: work for north vietnam + east germany
 
-      for(var i = 0; i < json.length; i++){
-        if(json[i].start <= year && (json[i].end == null || year <= json[i].end)){
-          //Add year to killfeed
-          if(json[i].start == year) $("#killfeed p").append("<span data-year = '" + year +"'>" + year + ": " + json[i].name + " fell to communism<br></span>");
-          json[i].country_codes.forEach(function(code){
-            countriesToColor.push(code);
-          });
-        }
-        else if(json[i].end != null && (year > json[i].end || year < json[i].start)){
-          //TODO: add killfeed
-          json[i].country_codes.forEach(function(code){
-            countriesToUncolor.push(code);
-          });
-        }
+  for(var i = 0; i < json.length; i++){
+    if((json[i].other_years == year) || (json[i].start <= year && (json[i].end == null || year <= json[i].end))){
+      //Add year to killfeed
+      if((json[i].start == year || json[i].other_years == year) && !killfeed.includes(json[i].name)){
+        $("#killfeed p").append("<span data-year = '" + year +"' data-code = '" + json[i].name + "'>" + year + ": " + json[i].name + " fell to communism<br></span>");
+        killfeed.push(json[i].name);
       }
+      json[i].country_codes.forEach(function(code){
+        countriesToColor.push(code);
+      });
+    }
+    else if(((json[i].end == null && year < json[i].start) || (json[i].end != null && (year > json[i].end || year < json[i].start))) && json[i].other_years != year){
+      json[i].country_codes.forEach(function(code){
+        countriesToUncolor.push(code);
+      });
+    }
+  }
 
-      if(countriesToColor.length > 0 || countriesToUncolor.length > 0){
-        geojsonLayer.eachLayer(function(layer){
-          if(countriesToColor.includes(layer.feature.properties.A3)){
-            layer.setStyle({
-              fillOpacity: 0.3,
-              opacity: 1
-            });
-          }
-          else if(countriesToUncolor.includes(layer.feature.properties.A3)){
-            layer.setStyle({
-              fillOpacity: 0,
-              opacity: 0
-            });
-          }
+  if(countriesToColor.length > 0 || countriesToUncolor.length > 0){
+    geojsonLayer.eachLayer(function(layer){
+      if(countriesToColor.includes(layer.feature.properties.A3)){
+        layer.setStyle({
+          fillOpacity: 0.3,
+          opacity: 1
         });
       }
+      else if(countriesToUncolor.includes(layer.feature.properties.A3)){
+        layer.setStyle({
+          fillOpacity: 0,
+          opacity: 0
+        });
+      }
+    });
+  }
+}
 
+function startVisualization(){
+  setInterval(function(){
+    if(!paused){
       goForward();
     }
 
     //Killfeed animation
     $("#killfeed p span").each(function(){
-      if($(this).data().year - year > 0) $(this).remove();
+      if($(this).data().year - year > 0) {
+        $(this).remove();
+        killfeed.splice(killfeed.indexOf($(this).data().code), 1);
+      }
       else if($(this).data().year - year <= -3){
         $(this).fadeOut(function(){
           $(this).remove();
+          killfeed.splice(killfeed.indexOf($(this).data().code), 1);
         });
       }
     });
